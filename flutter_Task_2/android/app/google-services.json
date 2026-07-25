@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "991323594383",
+    "project_id": "hogwarts-authentication",
+    "storage_bucket": "hogwarts-authentication.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991323594383:android:913a2488f22d1f61b65afa",
+        "android_client_info": {
+          "package_name": "com.example.flutter_task_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYJ4Lg4wgOqYjvmXGqWL5ix2jDxJfIqRU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

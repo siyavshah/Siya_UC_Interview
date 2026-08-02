@@ -8,7 +8,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "The Great Hall",
+          "The Chamber of Secrets",
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -16,30 +16,32 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 88, 68, 61),
+        backgroundColor: const Color.fromARGB(255, 66, 80, 55),
       ),
 
       body: Container(
+        height: double.infinity,
+        width: double.infinity,
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/images/hogwarts.jpg"),
+            image: AssetImage("assets/images/chamber.jpg"),
             fit: BoxFit.cover,
           ),
         ),
 
         child: Center(
           child: Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
               color: const Color.fromARGB(255, 245, 230, 200),
               borderRadius: BorderRadius.circular(15),
             ),
             child: Text(
-              "Welcome to Hogwarts!",
+              "The Chamber of Secrets has been opened!",
               style: TextStyle(
-                fontSize: 28,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 88, 68, 61),
+                color: Color.fromARGB(255, 66, 80, 55),
               ),
             ),
           ),

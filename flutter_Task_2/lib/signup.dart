@@ -3,7 +3,6 @@ import 'home.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -14,10 +13,14 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
 
   @override
   void dispose() {
     _passwordController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
@@ -37,7 +40,7 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 88, 68, 61),
+        backgroundColor: const Color.fromARGB(255, 66, 80, 55),
         foregroundColor: const Color.fromARGB(255, 245, 218, 164),
       ),
 
@@ -53,7 +56,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 88, 68, 61),
+                    color: Color.fromARGB(255, 66, 80, 55),
                   ),
                 ),
 
@@ -62,9 +65,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
-                    decoration: InputDecoration(
-                      labelText: "Name",
-                    ),
+                    decoration: InputDecoration(labelText: "Name"),
+                    controller: _nameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Please enter your name";
@@ -79,9 +81,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                    ),
+                    decoration: InputDecoration(labelText: "Email"),
+                    controller: _emailController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Please enter your email";
@@ -100,9 +101,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
                     obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                    ),
+                    decoration: InputDecoration(labelText: "Password"),
                     controller: _passwordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -122,9 +121,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
                     obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: "Confirm Password",
-                    ),
+                    decoration: InputDecoration(labelText: "Confirm Password"),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Please confirm your password";
@@ -145,16 +142,42 @@ class _SignupScreenState extends State<SignupScreen> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         try {
-                          await FirebaseAuth
+                          await FirebaseAuth.instance
+                              .createUserWithEmailAndPassword(
+                                email: _emailController.text.trim(),
+                                password: _passwordController.text,
+                              );
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Your journey begins now!(Sign Up Succesful)")),
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HomeScreen(),
+                            ),
+                          );
                         } on FirebaseAuthException catch (e) {
-
+                          if (e.code == 'email-already-in-use') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("This wiz-mail already exists."),
+                              ),
+                            );
+                          } else if (e.code == 'weak-password') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Protect your vault with a stronger password."),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(e.message ?? "Oops... Error Occurred."),
+                              ),
+                            );
+                          }
                         }
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
-                          ),
-                        );
                       }
                     },
                     child: const Text("Sign Up"),

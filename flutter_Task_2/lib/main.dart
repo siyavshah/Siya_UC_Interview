@@ -1,17 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'signup.dart';
 import 'home.dart';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/widgets.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-    );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -24,9 +22,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       theme: ThemeData(
-        primaryColor: const Color.fromARGB(255, 133, 103, 92),
+        primaryColor: const Color.fromARGB(255, 66, 80, 55),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 133, 103, 92),
+          seedColor: const Color.fromARGB(255, 66, 80, 55),
         ),
 
         inputDecorationTheme: const InputDecorationTheme(
@@ -38,16 +36,15 @@ class MyApp extends StatelessWidget {
         ),
 
         elevatedButtonTheme: ElevatedButtonThemeData(
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Color.fromARGB(255, 88, 68, 61),
-    foregroundColor: Color.fromARGB(255, 245, 230, 200),
-    padding: const EdgeInsets.symmetric(vertical: 15),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-  ),
-),
-
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color.fromARGB(255, 66, 80, 55),
+            foregroundColor: Color.fromARGB(255, 245, 230, 200),
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
       ),
 
       home: const LoginScreen(),
@@ -64,6 +61,15 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: const Color.fromARGB(255, 245, 230, 200),
       appBar: AppBar(
         title: const Text(
-          "Diagon Alley Entryway",
+          "The Chamber of Secrets",
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -80,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Color.fromARGB(255, 88, 68, 61),
+        backgroundColor: Color.fromARGB(255, 66, 80, 55),
         foregroundColor: Color.fromARGB(255, 245, 218, 164),
       ),
       body: SingleChildScrollView(
@@ -95,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 88, 68, 61),
+                    color: Color.fromARGB(255, 66, 80, 55),
                   ),
                 ),
 
@@ -104,6 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
                     decoration: InputDecoration(labelText: "Email"),
+                    controller: _emailController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Please enter your email";
@@ -122,6 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: TextFormField(
                     obscureText: true,
                     decoration: InputDecoration(labelText: "Password"),
+                    controller: _passwordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Please enter your password";
@@ -140,14 +148,37 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomeScreen(),
-                            ),
-                          );
+                          try {
+                            await FirebaseAuth.instance
+                                .signInWithEmailAndPassword(
+                                  email: _emailController.text.trim(),
+                                  password: _passwordController.text,
+                                );
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Welcome back to the Chamber!"),
+                              ),
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HomeScreen(),
+                              ),
+                            );
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'invalid-credential') {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "The Chamber rejected your Admission. \nTry Signing Up.",
+                                  ),
+                                ),
+                              );
+                            }
+                          }
                         }
                       },
                       child: Text(

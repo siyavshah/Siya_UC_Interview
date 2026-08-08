@@ -71,4 +71,20 @@ func main() {
 	for _, creature := range creatures {
 		printC(creature)
 	}
+
+	max := 0
+
+mark := []int{
+	23, 45, 66, 20, 87,
 }
+
+for _, m := range mark {
+		if m>max {
+			max=m
+		}
+	}
+
+	fmt.Println("Max marks: ",max)
+
+}
+
